@@ -42,16 +42,17 @@ int main(int argc, char* argv [] )
   //Create a renderer, render window, and interactor
   vtkSmartPointer<vtkRenderer> renderer =
     vtkSmartPointer<vtkRenderer>::New();
-  //We go through teh file
+  //We go through the file
   while (! seedFile.eof() )
     {
     getline (seedFile,line);
-    if (line != "") // last line is empty...
+    if (line != "") // if line contains something interresting
       {
       sStream.clear();
       sStream.str("");
       sStream.str(line);
-      // we read each line of the file :
+      // we read each line of the file, hooping that it contains:
+      //confidence [space] Xposition [space] Yposition [space] Zposition
       sStream >> fConfidence
               >> pt[0]
               >> pt[1]
