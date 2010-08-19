@@ -6,6 +6,8 @@
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindowInteractor.h>
+#include <vtkImageReader2Factory.h>
+
 
 #include <sstream>
 
@@ -79,6 +81,9 @@ int main(int argc, char* argv [] )
                 << " Y= "<< pt[1] << std::endl
                 << " Z= "<< pt[2] << std::endl
                 << " Conf= "<< fConfidence <<std::endl;
+
+
+
       }
     }
   seedFile.close();
@@ -93,7 +98,7 @@ int main(int argc, char* argv [] )
 
 
   // render and display the window
-  renderer->SetBackground(.3, .6, .3); // Background color green
+  renderer->SetBackground(0, 0, 0); // Background color green
   renderer->ResetCamera();
   renderWindow->Render();
   renderWindowInteractor->Initialize();
