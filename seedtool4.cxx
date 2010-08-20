@@ -7,11 +7,11 @@
 #include <vtkRenderer.h>
 #include <vtkRenderWindowInteractor.h>
 
-
 #include <vtkImageResample.h>
 #include <vtkPiecewiseFunction.h>
 #include <vtkColorTransferFunction.h>
-#include <vtkVolumeTextureMapper2D.h>
+//#include <vtkVolumeTextureMapper2D.h>
+#include <vtkSmartVolumeMapper.h>
 #include <vtkVolumeProperty.h>
 #include <vtkVolume.h>
 #include <vtkParticleReader.h>
@@ -42,10 +42,12 @@ int main(int argc, char* argv [] )
     vtkSmartPointer<vtkParticleReader>::New();
   reader->SetFileName(inputFileName.c_str());
   reader->Update();
-  // create the glyph (a sphere)
+  // create the glyph (a sphere), very low res
   vtkSmartPointer<vtkSphereSource> sphereSource =
     vtkSmartPointer<vtkSphereSource>::New();
   sphereSource->SetRadius(1.);
+  sphereSource->SetThetaResolution(3);
+  sphereSource->SetPhiResolution(6);
 
   // create the glyph mapper
   vtkSmartPointer<vtkGlyph3DMapper> glyph =
@@ -83,64 +85,64 @@ int main(int argc, char* argv [] )
 
 
 
-  vtkSmartPointer<vtkImageResample> resample =
-      vtkSmartPointer<vtkImageResample>::New();
-     {
-  resample->SetInputConnection( imgReader->GetOutputPort() );
-  resample->SetAxisMagnificationFactor(0, 0.25);
-  resample->SetAxisMagnificationFactor(1, 0.25);
-  resample->SetAxisMagnificationFactor(2, 1.);
-  }
+//  vtkSmartPointer<vtkImageResample> resample =
+//      vtkSmartPointer<vtkImageResample>::New();
+//     {
+//  resample->SetInputConnection( imgReader->GetOutputPort() );
+//  resample->SetAxisMagnificationFactor(0, 1.);
+//  resample->SetAxisMagnificationFactor(1, 1.);
+//  resample->SetAxisMagnificationFactor(2, 1.);
+//  }
+
+
 
   vtkSmartPointer<vtkImageCast> cast = vtkSmartPointer<vtkImageCast>::New();
-  cast->SetInputConnection(resample->GetOutputPort());
+  cast->SetInputConnection(imgReader->GetOutputPort());
   cast->SetOutputScalarTypeToUnsignedChar();
   cast->Update();
 
 
-  /*
-  double m_scalarRange[2];
-  image->GetScalarRange(m_scalarRange);
-  */
-/*
-  vtkSmartPointer<vtkLookupTable> cmap =
-    vtkSmartPointer<vtkLookupTable>::New();
-  cmap->SetNumberOfColors( VTK_UNSIGNED_CHAR_MAX + 1 );
-  cmap->SetTableRange( VTK_UNSIGNED_CHAR_MIN, VTK_UNSIGNED_CHAR_MAX );
 
-  double value;
-  for (i=0;i<256;++i)
-    {
-    value = i/m_scalarRange[1];
-    cmap->SetTableValue(i,value,value,value,1.0);
 
-    }
-*/
+//  vtkSmartPointer<vtkLookupTable> cmap =
+//    vtkSmartPointer<vtkLookupTable>::New();
+//  cmap->SetNumberOfColors( VTK_UNSIGNED_CHAR_MAX + 1 );
+//  cmap->SetTableRange( VTK_UNSIGNED_CHAR_MIN, VTK_UNSIGNED_CHAR_MAX );
+
+//  double value;
+//  for (i=0;i<256;++i)
+//    {
+//    value = i/m_scalarRange[1];
+//    cmap->SetTableValue(i,value,value,value,1.0);
+
+//    }
+
 // Create transfer function mapping scalar value to opacity
   vtkSmartPointer<vtkPiecewiseFunction> opacityTransferFunction =
     vtkSmartPointer<vtkPiecewiseFunction>::New();
-  opacityTransferFunction->AddPoint(40, 0.);
-  opacityTransferFunction->AddPoint(VTK_UNSIGNED_CHAR_MAX, 1.0);
+  opacityTransferFunction->AddPoint(10, 0.);
+  opacityTransferFunction->AddPoint(150, 1.0);
 
-  /*
+
 // Create transfer function mapping scalar value to color
   vtkSmartPointer<vtkColorTransferFunction> colorTransferFunction =
         vtkSmartPointer<vtkColorTransferFunction>::New();
   colorTransferFunction->AddRGBPoint(0.0,0.0,0.0,0.0);
-  colorTransferFunction->AddRGBPoint	(255.0,1.0,1.0,1.0);
-*/
+  colorTransferFunction->AddRGBPoint	(200,1.0,1.0,1.0);
+
 // The property describes how the data will look
     vtkSmartPointer<vtkVolumeProperty> volumeProperty =
   vtkSmartPointer<vtkVolumeProperty>::New();
- // volumeProperty->SetColor( colorTransferFunction );
+  volumeProperty->SetColor( colorTransferFunction );
   volumeProperty->SetScalarOpacity(opacityTransferFunction );
-  volumeProperty->SetInterpolationTypeToLinear();
+  volumeProperty->SetInterpolationTypeToLinear();;
 
 
-  vtkSmartPointer<vtkVolumeTextureMapper2D> volumeMapper =
-      vtkSmartPointer<vtkVolumeTextureMapper2D> ::New();
-  volumeMapper->SetInput( cast->GetOutput() );
-
+vtkSmartPointer<vtkSmartVolumeMapper> volumeMapper =
+      vtkSmartPointer<vtkSmartVolumeMapper> ::New();
+volumeMapper->SetInputConnection( cast->GetOutputPort() );
+volumeMapper->SetInterpolationModeToNearestNeighbor();
+//volumeMapper->SetRequestedRenderMode(volumeMapper->GPURenderMode);
 
   // The volume holds the mapper and the property and
   // can be used to position/orient the volume
@@ -151,13 +153,13 @@ int main(int argc, char* argv [] )
 
 
   // render and display the window
-
   renderer->AddVolume(volume);
+
+
   renderer->SetBackground(0., 0., 0.); // Background color green
   renderer->ResetCamera();
   renderWindow->Render();
   renderWindowInteractor->Initialize();
   renderWindowInteractor->Start();
-
   return EXIT_SUCCESS;
 }
