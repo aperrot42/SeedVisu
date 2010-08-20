@@ -119,19 +119,20 @@ int main(int argc, char* argv [] )
 // Create transfer function mapping scalar value to opacity
   vtkSmartPointer<vtkPiecewiseFunction> opacityTransferFunction =
     vtkSmartPointer<vtkPiecewiseFunction>::New();
-  opacityTransferFunction->AddPoint(40, VTK_UNSIGNED_CHAR_MIN);
+  opacityTransferFunction->AddPoint(40, 0.);
   opacityTransferFunction->AddPoint(VTK_UNSIGNED_CHAR_MAX, 1.0);
 
+  /*
 // Create transfer function mapping scalar value to color
   vtkSmartPointer<vtkColorTransferFunction> colorTransferFunction =
         vtkSmartPointer<vtkColorTransferFunction>::New();
   colorTransferFunction->AddRGBPoint(0.0,0.0,0.0,0.0);
   colorTransferFunction->AddRGBPoint	(255.0,1.0,1.0,1.0);
-
+*/
 // The property describes how the data will look
     vtkSmartPointer<vtkVolumeProperty> volumeProperty =
   vtkSmartPointer<vtkVolumeProperty>::New();
-  volumeProperty->SetColor( colorTransferFunction );
+ // volumeProperty->SetColor( colorTransferFunction );
   volumeProperty->SetScalarOpacity(opacityTransferFunction );
   volumeProperty->SetInterpolationTypeToLinear();
 
@@ -152,7 +153,7 @@ int main(int argc, char* argv [] )
   // render and display the window
 
   renderer->AddVolume(volume);
-  renderer->SetBackground(1, 0.4, 0.7); // Background color green
+  renderer->SetBackground(0., 0., 0.); // Background color green
   renderer->ResetCamera();
   renderWindow->Render();
   renderWindowInteractor->Initialize();
