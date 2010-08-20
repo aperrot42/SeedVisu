@@ -8,6 +8,7 @@ INCLUDE(${VTK_USE_FILE})
 ADD_EXECUTABLE(itksdt seedtool.cxx)
 ADD_EXECUTABLE(itksdt2 seedtool2.cxx)
 ADD_EXECUTABLE(itksdt3 seedtool3.cxx)
+ADD_EXECUTABLE(itksdt4 seedtool4.cxx)
 
 
 TARGET_LINK_LIBRARIES(itksdt
@@ -16,3 +17,7 @@ TARGET_LINK_LIBRARIES(itksdt2
  vtkHybrid)
 TARGET_LINK_LIBRARIES(itksdt3
  vtkHybrid)
+TARGET_LINK_LIBRARIES(itksdt4
+ vtkHybrid
+ vtkCommon
+vtkVolumeRendering)
