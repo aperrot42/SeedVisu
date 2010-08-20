@@ -7,10 +7,12 @@
 #include <vtkRenderer.h>
 #include <vtkRenderWindowInteractor.h>
 
+
+#include <vtkImageResample.h>
 #include <vtkPiecewiseFunction.h>
 #include <vtkColorTransferFunction.h>
 #include <vtkVolumeTextureMapper2D.h>
-#include <vtkvolumeProperty.h>
+#include <vtkVolumeProperty.h>
 #include <vtkVolume.h>
 #include <vtkParticleReader.h>
 #include <vtkGlyph3DMapper.h>
@@ -79,12 +81,23 @@ int main(int argc, char* argv [] )
   imgReader->SetFileName(argv[2]);
   imgReader->Update();
 
+
+
+  vtkSmartPointer<vtkImageResample> resample =
+      vtkSmartPointer<vtkImageResample>::New();
+     {
+  resample->SetInputConnection( imgReader->GetOutputPort() );
+  resample->SetAxisMagnificationFactor(0, 0.25);
+  resample->SetAxisMagnificationFactor(1, 0.25);
+  resample->SetAxisMagnificationFactor(2, 1.);
+  }
+
   vtkSmartPointer<vtkImageCast> cast = vtkSmartPointer<vtkImageCast>::New();
-  cast->SetInput(imgReader->GetOutput());
+  cast->SetInputConnection(resample->GetOutputPort());
   cast->SetOutputScalarTypeToUnsignedChar();
   cast->Update();
 
-  vtkSmartPointer<vtkImageData> m_image = imgReader->GetOutput();
+
   /*
   double m_scalarRange[2];
   image->GetScalarRange(m_scalarRange);
@@ -134,8 +147,6 @@ int main(int argc, char* argv [] )
       vtkSmartPointer<vtkVolume>::New();
   volume->SetMapper	( volumeMapper );
   volume->SetProperty( volumeProperty );
-
-
 
 
   // render and display the window
