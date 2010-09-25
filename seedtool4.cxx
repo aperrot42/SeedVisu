@@ -25,14 +25,16 @@
 int main(int argc, char* argv [] )
 {
 
-  if ( argc < 2 )
+  if ( argc < 3 )
     {
     std::cerr << "Missing Parameters: "
               << argv[0] << std::endl
-              << "seedfile(*.txt)"
+              << "seedfile(*.txt) image(itkvtkimage) opacity:min(double)-max(double) color:min(double)-max(double)"
               << std::endl;
     return EXIT_FAILURE;
     }
+
+
 
   std::cout << "Opening " << argv[1] << std::endl;
 
@@ -120,13 +122,37 @@ int main(int argc, char* argv [] )
 // Create transfer function mapping scalar value to opacity
   vtkSmartPointer<vtkPiecewiseFunction> opacityTransferFunction =
     vtkSmartPointer<vtkPiecewiseFunction>::New();
-  opacityTransferFunction->AddPoint(10, 0.);
-  opacityTransferFunction->AddPoint(150, 1.0);
 
+  if (argc>=5)
+    {
+    int minop = atoi(argv[3]);
+    int maxop = atoi(argv[4]);
+    opacityTransferFunction->AddPoint(minop, 0.);
+    opacityTransferFunction->AddPoint(maxop, 1.0);
+    }
+  else
+    {
+    opacityTransferFunction->AddPoint(10, 0.);
+    opacityTransferFunction->AddPoint(150, 1.0);
+    }
+  opacityTransferFunction->AddPoint(255, 1.0);
 
 // Create transfer function mapping scalar value to color
   vtkSmartPointer<vtkColorTransferFunction> colorTransferFunction =
         vtkSmartPointer<vtkColorTransferFunction>::New();
+
+  if (argc==7)
+    {
+    int mincol = atoi(argv[5]);
+    int maxcol = atoi(argv[6]);
+    colorTransferFunction->AddRGBPoint(mincol,0.0,0.0,0.0);
+    colorTransferFunction->AddRGBPoint	(maxcol,1.0,1.0,1.0);
+    }
+  else
+    {
+    colorTransferFunction->AddRGBPoint(0.0,0.0,0.0,0.0);
+    colorTransferFunction->AddRGBPoint	(200,1.0,1.0,1.0);
+    }
   colorTransferFunction->AddRGBPoint(0.0,0.0,0.0,0.0);
   colorTransferFunction->AddRGBPoint	(200,1.0,1.0,1.0);
 
